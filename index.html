@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>📋 Gestion Travaux</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    input[type="file"] {
+      font-size: 24px;
+      margin-bottom: 1rem;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      max-height: 800px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+    }
+    li {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eee;
+    }
+    li:last-child {
+      border-bottom: none;
+    }
+    .title {
+      font-weight: bold;
+      font-size: 2em;
+      margin-bottom: 4px;
+      color: #007acc;
+    }
+    .subtitle {
+      font-size: 1.4em;
+      color: #555;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📋 Charger et afficher le fichier travaux.txt</h2>
+  <input type="file" id="travauxInput" accept=".txt" />
+  <ul id="travauxList"></ul>
+
+  <script>
+    const travauxInput = document.getElementById('travauxInput');
+    const travauxList = document.getElementById('travauxList');
+
+    // Fonction pour parser une date au format dd-MM-yyyy
+    function parseDateDDMMYYYY(str) {
+      const regex = /^(\d{2})-(\d{2})-(\d{4})$/;
+      const match = regex.exec(str);
+      if (!match) return null;
+      const day = parseInt(match[1], 10);
+      const month = parseInt(match[2], 10) - 1;
+      const year = parseInt(match[3], 10);
+      const date = new Date(year, month, day);
+      if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+        return null;
+      }
+      return date;
+    }
+
+    travauxInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target.result;
+        let lines = content.split('\n').filter(line => line.trim().length > 0);
+		
+		function parseDateDDMMYYYY(str) {
+		  const [day, month, year] = str.split('-');
+		  return new Date(`${year}-${month}-${day}`);
+		}
+
+		lines.sort((a, b) => {
+		  const partsA = a.split(',');
+		  const partsB = b.split(',');
+
+		  const dateStrA = partsA[7] ? partsA[7].trim() : null;
+		  const dateStrB = partsB[7] ? partsB[7].trim() : null;
+
+		  const dateA = dateStrA ? parseDateDDMMYYYY(dateStrA) : null;
+		  const dateB = dateStrB ? parseDateDDMMYYYY(dateStrB) : null;
+
+		  if (!dateA && !dateB) return 0;
+		  if (!dateA) return 1;
+		  if (!dateB) return -1;
+
+		  return dateA - dateB; // Tri croissant (du plus ancien au plus récent)
+		});
+
+        travauxList.innerHTML = '';
+
+        lines.forEach(line => {
+          const parts = line.split(',');
+          if (parts.length < 7) return;
+
+          const titleText = `${parts[1].trim()} ${parts[2].trim()}`;
+
+          const subtitleParts = parts.slice(3, 8).filter(p => 
+              p && 
+              p.trim() !== '' && 
+              p.trim().toLowerCase() !== 'null' && 
+              p.trim().toLowerCase() !== 'undefined'
+            );
+
+          const subtitleText = subtitleParts.join(' | ');
+
+          const li = document.createElement('li');
+
+          const title = document.createElement('div');
+          title.className = 'title';
+          title.textContent = titleText;
+
+          const subtitle = document.createElement('div');
+          subtitle.className = 'subtitle';
+          subtitle.textContent = subtitleText;
+
+          li.appendChild(title);
+          if (subtitleText) li.appendChild(subtitle);
+
+          travauxList.appendChild(li);
+        });
+      };
+      reader.readAsText(file);
+    });
+  </script>
+
+</body>
+</html>
