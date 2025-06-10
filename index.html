@@ -84,22 +84,29 @@
 		  const [day, month, year] = str.split('-');
 		  return new Date(`${year}-${month}-${day}`);
 		}
-
+		
 		lines.sort((a, b) => {
 		  const partsA = a.split(',');
 		  const partsB = b.split(',');
-
-		  const dateStrA = partsA[7] ? partsA[7].trim() : null;
-		  const dateStrB = partsB[7] ? partsB[7].trim() : null;
-
+		
+		  const idA = parseInt(partsA[0]?.trim(), 10);
+		  const idB = parseInt(partsB[0]?.trim(), 10);
+		
+		  if (idA !== idB) {
+		    return idB - idA; // Tri par ID décroissant
+		  }
+		
+		  const dateStrA = partsA[7]?.trim();
+		  const dateStrB = partsB[7]?.trim();
+		
 		  const dateA = dateStrA ? parseDateDDMMYYYY(dateStrA) : null;
 		  const dateB = dateStrB ? parseDateDDMMYYYY(dateStrB) : null;
-
+		
 		  if (!dateA && !dateB) return 0;
 		  if (!dateA) return 1;
 		  if (!dateB) return -1;
-
-		  return dateA - dateB; // Tri croissant (du plus ancien au plus récent)
+		
+		  return dateB - dateA; // Tri par date décroissante
 		});
 
         travauxList.innerHTML = '';
