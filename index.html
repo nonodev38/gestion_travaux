@@ -71,11 +71,6 @@
         const partsA = a.split(',');
         const partsB = b.split(',');
 
-        const idA = parseInt(partsA[0]?.trim(), 10);
-        const idB = parseInt(partsB[0]?.trim(), 10);
-
-        if (idA !== idB) return idB - idA;
-
         const dateStrA = partsA[7]?.trim();
         const dateStrB = partsB[7]?.trim();
 
