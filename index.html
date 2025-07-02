@@ -46,27 +46,101 @@
       color: #555;
       white-space: pre-wrap;
     }
+
+    .btn-ajouter {
+      margin-bottom: 1rem;
+      padding: 10px 16px;
+      background: #007acc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .form-container {
+      display: none;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .form-container label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+    }
+
+    .form-container input,
+    .form-container select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .form-container button {
+      padding: 8px 12px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
   <h2>📋 Liste Travaux A Effectuer</h2>
+
+  <button class="btn-ajouter" onclick="toggleForm()">+ Ajouter Une Fiche</button>
+
+  <div class="form-container" id="formContainer">
+    <label for="type">Type</label>
+    <select id="type">
+      <option value="MH">MH</option>
+      <option value="CH">CH</option>
+      <option value="EMP">EMP</option>
+      <option value="BAT">BAT</option>
+    </select>
+
+    <label for="numero">Numéro</label>
+    <input type="text" id="numero" placeholder="Entrez un numéro" />
+
+    <label for="famille">Famille Travaux</label>
+    <select id="famille">
+      <option value="Deco">Deco</option>
+      <option value="Electricité">Electricité</option>
+      <option value="Fenetre">Fenetre</option>
+      <option value="MobilHome">MobilHome</option>
+      <option value="Plomberie">Plomberie</option>
+      <option value="Porte">Porte</option>
+      <option value="Terrasse">Terrasse</option>
+      <option value="Casse Intérieur">Casse Intérieur</option>
+    </select>
+
+    <button onclick="ajouterFiche()">Ajouter</button>
+  </div>
+
   <ul id="travauxList"></ul>
 
   <script>
     const travauxList = document.getElementById('travauxList');
+    const formContainer = document.getElementById('formContainer');
 
-    // Fonction pour parser une date en format dd-MM-yyyy
+    function toggleForm() {
+      formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
+    }
+
     function parseDateDDMMYYYY(str) {
       const [day, month, year] = str.split('-');
       return new Date(`${year}-${month}-${day}`);
     }
 
-    // Fonction pour afficher les travaux à partir du contenu brut du fichier
     function afficherTravaux(contenu) {
       let lines = contenu.split('\n').filter(line => line.trim().length > 0);
 
-      // Tri des lignes par ID décroissant puis date décroissante
       lines.sort((a, b) => {
         const partsA = a.split(',');
         const partsB = b.split(',');
@@ -84,10 +158,8 @@
         return dateA - dateB;
       });
 
-      // Nettoyage de la liste HTML
       travauxList.innerHTML = '';
 
-      // Affichage de chaque ligne
       lines.forEach(line => {
         const parts = line.split(',');
         if (parts.length < 7) return;
@@ -101,7 +173,6 @@
         const subtitleText = subtitleParts.join(' | ');
 
         const li = document.createElement('li');
-
         const title = document.createElement('div');
         title.className = 'title';
         title.textContent = titleText;
@@ -117,7 +188,25 @@
       });
     }
 
-    // Chargement du fichier bdTravaux.txt depuis le même répertoire
+    function ajouterFiche() {
+      const type = document.getElementById('type').value.trim();
+      const numero = document.getElementById('numero').value.trim();
+      const famille = document.getElementById('famille').value.trim();
+
+      if (!numero) {
+        alert("Le champ 'Numéro' est requis.");
+        return;
+      }
+
+      const ligne = `0,${type},${numero},${famille},,,,,`;
+      afficherTravaux(ligne + '\n' + travauxList.innerText); // Simule l’ajout
+      alert("Fiche ajoutée (non sauvegardée dans le fichier réel).");
+
+      // Réinitialisation
+      document.getElementById('numero').value = '';
+      toggleForm();
+    }
+
     fetch('bdTravaux.txt')
       .then(response => {
         if (!response.ok) throw new Error("Fichier introuvable");
@@ -129,6 +218,5 @@
         travauxList.innerHTML = '<li>Erreur de chargement du fichier bdTravaux.txt.</li>';
       });
   </script>
-
 </body>
 </html>
