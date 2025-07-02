@@ -153,6 +153,18 @@
       return new Date(`${y}-${m}-${d}`);
     }
 
+      // Met la date d'aujourd'hui par défaut dans le champ #date
+    window.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('date');
+      if (dateInput) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        dateInput.value = `${yyyy}-${mm}-${dd}`; // Format requis pour input[type="date"]
+      }
+    });
+
     function afficherTravaux() {
       travaux.sort((b, a) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection));
       const list = document.getElementById('travauxList');
