@@ -146,7 +146,7 @@
     }
 
     function afficherTravaux() {
-      travaux.sort((a, b) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection));
+      travaux.sort((b, a) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection));
       const list = document.getElementById('travauxList');
       list.innerHTML = '';
 
