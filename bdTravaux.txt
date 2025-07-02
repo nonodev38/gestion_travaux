@@ -1,3 +1,20 @@
+
+Conversation ouverte. 1 message lu.
+
+Aller au contenu
+Utiliser Gmail avec un lecteur d'écran
+2 sur 413
+Fichiers Camp à transférer
+Boîte de réception
+Bruno Urban <urban.bruno10@gmail.com>
+	
+Pièces jointesmar. 1 juil. 06:58 (il y a 23 heures)
+	
+À moi
+Voici les fichiers .txt du dossier transfertCamp. 
+ 6 pièces jointes  • Analyse effectuée par Gmail
+	
+
 5,mh,25,Terrasse,Lames HS,null,
 10,mh,197,Electricité,Tableau Ext,null,déplacer le coffret côté route
 22,mh,22,Plomberie,Fuite Syphon,,exterieur douche
@@ -10,32 +27,24 @@
 39,emp,sanitaire 2,Electricité,Prise defectueuse,,checker prises
 46,mh,22,Plomberie,,,remplacer la porte de douche
 66,mh,15,Deco,,,poser plinthes perif douche,01-09-2025,null
-67,mh,01,MobilHome,null,,checker les stores,06-06-2025,null
 70,emp,terrain pétanque,Deco,,,poser des basteing en périphérie du terrain,10-06-2025,null
 4,mh,16,Terrasse,Lames HS,null,
 6,mh,01,Terrasse,Lames HS,null,
-19,emp,sanitaire 2,Plomberie,Joint Douche HS,,
 72,emp,fontaines,Deco,,,désherbage des points d'eau,08-06-2025,null
-74,mh,13,MobilHome,,,store voir chaînette,08-06-2025,null
 75,mh,04,MobilHome,,,latte lits hs ch enf,02-07-2025,null
 80,mh,167,Plomberie,null,,voir fuite après compteur tester 1000 bulles,24-06-2025,null
-34,emp,208,MobilHome,null,,piège à rats sous arbre voir video,24-06-2025,null
-87,mh,09,Electricité,Ampoule HS,,,04-06-2025,null
-89,mh,01,Plomberie,Fuite Robinet,,pomme de douche,06-06-2025,null
 1,mh,01,Plomberie,Joint Evier Cuis.,,,23-06-2025,null
 12,mh,30,Plomberie,Fuite Syphon,,exterieur douche ne tient plus,10-06-2025,null
 79,emp,atelier,Plomberie,,,poser un regard robinet ext,02-06-2025,null
 95,mh,34,Plomberie,Fuite Robinet,,remplacer cartouche robinet,10-06-2025,null
 96,mh,momo,MobilHome,,,voir pour refixer le cheneau,10-06-2025,null
-99,mh,27,MobilHome,,,checker fuite de toit,24-06-2025,null
-100,emp,sanitaire 2,Deco,Sol HS,,recoller les carreaux,06-06-2025,null
 101,mh,01,Plomberie,Pb Chauffe Eau,,voir robinet cartouche peut-être hs passe de bouillant a froid,09-06-2025,null
-102,mh,90Amar,Plomberie,Pb Chauffe Eau,,voir chaudière eau chaude hs,09-06-2025,null
-103,ch,03,MobilHome,,,voir le renard,24-06-2025,null
-105,mh,18,MobilHome,,,contrôler le frigo si 4 étoiles candy,15-06-2025,null
-106,emp,piscine,Deco,,,appeler les gens du voyage pour débarrasser le local technique/commander produits/balai aspirateur de fond/batterie 6V,16-06-2025,null
-107,mh,16,Plomberie,Pb Chauffe Eau,,appeler Mathieu,15-06-2025,null
-108,mh,27,Plomberie,Pb Chauffe Eau,,appeler Mathieu,15-06-2025,null
-109,mh,07,Deco,,,peindre escaliers extérieurs,17-06-2025,null
-110,mh,31,Deco,,,peindre escaliers extérieurs,17-06-2025,null
-111,mh,entrée,Deco,,,poser panneau stop a la sortie du camping,17-06-2025,null
+109,mh,07,Deco,,,peindre escaliers extérieurs,26-06-2025,null
+110,mh,31,Deco,,,peindre escaliers extérieurs,26-06-2025,null
+112,mh,09,Plomberie,,,gazinière 1 brûleur hs voir pour réviser,31-08-2025,null
+114,emp,piscine,Deco,null,,checker le nettoyeur avec groupe,23-06-2025,null
+119,emp,vieille caravane,Deco,,,ramasser le verre et faire des fermetures,24-06-2025,null
+120,mh,masseuse,Deco,,,désherbage des points d'eau,29-06-2025,null
+122,emp,piscine,Terrasse,,,voir l'essaim a la piscine,28-06-2025,null
+123,emp,piscine,Plomberie,,,commander flexible pompe ph et chlore,28-06-2025,null
+124,emp,poubelle,Deco,,,débroussaillage vers les poubelles,30-06-2025,null
