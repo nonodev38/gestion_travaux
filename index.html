@@ -124,6 +124,9 @@
     <label for="precision">Précision des travaux</label>
     <input type="text" id="precision" placeholder="Précision des travaux" />
 
+    <label for="date">Date</label>
+    <input type="date" id="date" />
+
     <button onclick="ajouterFiche()">Ajouter</button>
   </div>
 
@@ -192,26 +195,44 @@
       });
     }
 
-    function ajouterFiche() {
-      const type = document.getElementById('type').value.trim();
-      const numero = document.getElementById('numero').value.trim();
-      const famille = document.getElementById('famille').value.trim();
-      const precision = document.getElementById('precision').value.trim();
+function ajouterFiche() {
+  const type = document.getElementById('type').value.trim();
+  const numero = document.getElementById('numero').value.trim();
+  const famille = document.getElementById('famille').value.trim();
+  const precision = document.getElementById('precision').value.trim();
+  const dateInput = document.getElementById('date').value;
 
-      if (!numero) {
-        alert("Le champ 'Numéro' est requis.");
-        return;
-      }
+  if (!numero) {
+    alert("Le champ 'Numéro' est requis.");
+    return;
+  }
 
-      const ligne = `0,${type},${numero},${famille},${precision},,,,,`;
-      afficherTravaux(ligne + '\n' + travauxList.innerText); // Simule l’ajout
-      alert("Fiche ajoutée (non sauvegardée dans le fichier réel).");
+  // Format de date : dd-MM-yyyy
+  let formattedDate = '';
+  if (dateInput) {
+    const [year, month, day] = dateInput.split('-');
+    formattedDate = `${day}-${month}-${year}`;
+  }
 
-      // Réinitialisation
-      document.getElementById('numero').value = '';
-      toggleForm();
-    }
+  // Format CSV simulé : id, type, numero, famille, precision, ?, ?, date, ?
+  const ligne = `0,${type},${numero},${famille},${precision},,,${formattedDate},`;
 
+  // Ajout en haut de la liste
+  const lignesExistantes = Array.from(travauxList.querySelectorAll("li")).map(li => {
+    const title = li.querySelector('.title')?.textContent || '';
+    const subtitle = li.querySelector('.subtitle')?.textContent || '';
+    return `0,${title.replace(/\s+/, ',')},${subtitle.split(' | ').join(',')}`;
+  });
+
+  afficherTravaux([ligne, ...lignesExistantes].join('\n'));
+  alert("Fiche ajoutée (non sauvegardée dans le fichier réel).");
+
+  // Réinitialisation
+  document.getElementById('numero').value = '';
+  document.getElementById('precision').value = '';
+  document.getElementById('date').value = '';
+  toggleForm();
+}
     fetch('bdTravaux.txt')
       .then(response => {
         if (!response.ok) throw new Error("Fichier introuvable");
