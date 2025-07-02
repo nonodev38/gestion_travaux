@@ -7,27 +7,108 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
   <style>
-    /* ... ton CSS inchangé ... */
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
       background: #f9f9f9;
       color: #333;
     }
-    /* ... tout le reste inchangé ... */
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .form-container {
+      border: 1px solid #ddd;
+      background: #fff;
+      padding: 1rem;
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      display: none;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 6px 8px;
+      box-sizing: border-box;
+      margin-top: 4px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button#btnSupprimer {
+      background-color: #d9534f;
+      color: white;
+      margin-left: 1rem;
+      display: none;
+    }
+    button#btnValider {
+      background-color: #5cb85c;
+      color: white;
+    }
+    button#btnAjouter, button#btnSupprimerTous {
+      background-color: #0275d8;
+      color: white;
+      margin: 0 0.5rem 1rem 0.5rem;
+    }
+    ul#travauxList {
+      list-style: none;
+      padding: 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    ul#travauxList li {
+      background: #fff;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    ul#travauxList li .title {
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    ul#travauxList li .subtitle {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 0.3rem;
+    }
+    ul#travauxList li button.modifier-btn {
+      background-color: #f0ad4e;
+      color: white;
+      border-radius: 4px;
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
     .date-container {
       position: relative;
       display: flex;
       align-items: center;
     }
-  
     .date-container .calendar-icon {
       position: absolute;
       left: 10px;
       font-size: 1.2em;
       pointer-events: none;
+      color: #999;
     }
-  
     .date-container input {
       padding-left: 32px;
       width: 100%;
@@ -36,32 +117,64 @@
 </head>
 <body>
 
-  <!-- ... ton HTML inchangé ... -->
+  <h1>📋 Gestion des Travaux</h1>
+
+  <div style="text-align:center; margin-bottom:1rem;">
+    <button id="btnAjouter">➕ Ajouter un travail</button>
+    <button id="btnSupprimerTous">🗑 Supprimer tous les travaux</button>
+  </div>
 
   <div class="form-container" id="formContainer">
-    <!-- ... autres champs ... -->
+    <input type="hidden" id="ficheId" />
+    <label for="type">Type</label>
+    <select id="type">
+      <option value="MH">MH</option>
+      <option value="ML">ML</option>
+      <option value="PF">PF</option>
+      <option value="CO">CO</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <label for="numero">Numéro</label>
+    <input type="text" id="numero" placeholder="Numéro" />
+
+    <label for="famille">Famille</label>
+    <select id="famille">
+      <option value="Deco">Deco</option>
+      <option value="Plomberie">Plomberie</option>
+      <option value="Electricité">Electricité</option>
+      <option value="Autre">Autre</option>
+    </select>
+
+    <label for="precision">Précision</label>
+    <input type="text" id="precision" placeholder="Précision (optionnelle)" />
+
     <label for="date">Date sélectionnée</label>
     <div class="date-container">
       <span class="calendar-icon">📅</span>
       <input type="text" id="date" placeholder="Sélectionnez une date" />
     </div>
-    <!-- ... boutons ... -->
+
+    <div style="margin-top:1rem;">
+      <button id="btnValider">Valider</button>
+      <button id="btnSupprimer">Supprimer</button>
+    </div>
   </div>
 
-  <!-- ... liste et autres boutons ... -->
+  <ul id="travauxList"></ul>
 
   <script>
     let travaux = JSON.parse(localStorage.getItem('travaux')) || [];
 
-    // Nouvelle fonction adaptée au format dd/mm/yyyy
+    // Fonction pour parser une date au format dd/mm/yyyy en objet Date
     function parseDateDDMMYYYY(str) {
       if (!str) return null;
       const [d, m, y] = str.split('/');
-      return new Date(`${y}-${m}-${d}`);
+      return new Date(`${y}-${m}-${d}T00:00:00`);
     }
 
+    // Affiche la liste des travaux triée par date sélectionnée
     function afficherTravaux() {
-      // Trier par date sélectionnée (objet Date)
       travaux.sort((a, b) => {
         const dateA = parseDateDDMMYYYY(a.dateSelection);
         const dateB = parseDateDDMMYYYY(b.dateSelection);
@@ -74,48 +187,45 @@
       travaux.forEach(item => {
         const li = document.createElement('li');
 
+        const divText = document.createElement('div');
+        divText.style.flexGrow = '1';
+
         const title = document.createElement('div');
         title.className = 'title';
         title.textContent = `${item.type} ${item.numero}`;
 
         const subtitle = document.createElement('div');
         subtitle.className = 'subtitle';
-
-        // Afficher la date ajout et la date sélectionnée au format français
-        const formatFr = d => {
-          if (!d) return '';
-          const dateObj = new Date(d);
-          return dateObj.toLocaleDateString('fr-FR');
-        };
-
         subtitle.textContent = [
           item.famille,
-          item.precision,
+          item.precision || '',
           item.dateAjout,
           item.dateSelection
         ].filter(Boolean).join(' | ');
+
+        divText.appendChild(title);
+        divText.appendChild(subtitle);
 
         const btnModif = document.createElement('button');
         btnModif.className = 'modifier-btn';
         btnModif.textContent = '✏️ Modifier';
         btnModif.onclick = () => modifierFiche(item.id);
 
-        li.appendChild(title);
-        li.appendChild(subtitle);
+        li.appendChild(divText);
         li.appendChild(btnModif);
 
         list.appendChild(li);
       });
     }
 
+    // Affiche ou cache le formulaire, initialise la date du jour si affiché
     function toggleForm() {
       const form = document.getElementById('formContainer');
       const isCurrentlyHidden = form.style.display === 'none' || !form.style.display;
 
       if (isCurrentlyHidden) {
         form.style.display = 'block';
-
-        // Mettre la date du jour au format dd/mm/yyyy
+        clearForm();
         const dateInput = document.getElementById('date');
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -128,6 +238,7 @@
       }
     }
 
+    // Vide le formulaire et cache bouton supprimer
     function clearForm() {
       document.getElementById('ficheId').value = '';
       document.getElementById('type').value = 'MH';
@@ -138,6 +249,7 @@
       document.getElementById('btnSupprimer').style.display = 'none';
     }
 
+    // Valide l'ajout ou la modification de fiche
     function validerFiche() {
       const id = document.getElementById('ficheId').value;
       const type = document.getElementById('type').value;
@@ -153,11 +265,21 @@
       }
 
       if (id) {
-        // modification
+        // Modification
         const i = travaux.findIndex(t => t.id == id);
-        travaux[i] = { id: Number(id), type, numero, famille, precision, dateAjout: travaux[i].dateAjout, dateSelection };
+        if (i !== -1) {
+          travaux[i] = {
+            id: Number(id),
+            type,
+            numero,
+            famille,
+            precision,
+            dateAjout: travaux[i].dateAjout, // garder la date d'ajout initiale
+            dateSelection
+          };
+        }
       } else {
-        // ajout
+        // Ajout
         const newId = travaux.length ? Math.max(...travaux.map(t => t.id)) + 1 : 1;
         travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
       }
@@ -165,9 +287,9 @@
       localStorage.setItem('travaux', JSON.stringify(travaux));
       afficherTravaux();
       toggleForm();
-      clearForm();
     }
 
+    // Supprime une fiche sélectionnée
     function supprimerFiche() {
       const id = document.getElementById('ficheId').value;
       if (confirm("Supprimer cette fiche ?")) {
@@ -175,10 +297,10 @@
         localStorage.setItem('travaux', JSON.stringify(travaux));
         afficherTravaux();
         toggleForm();
-        clearForm();
       }
     }
 
+    // Supprime toutes les fiches
     function supprimerTousTravaux() {
       if (confirm("❗ Cette action supprimera tous les travaux enregistrés dans le navigateur. Êtes-vous sûr ?")) {
         localStorage.removeItem('travaux');
@@ -188,6 +310,7 @@
       }
     }
 
+    // Charge une fiche dans le formulaire pour modification
     function modifierFiche(id) {
       const f = travaux.find(t => t.id === id);
       if (!f) return;
@@ -201,15 +324,22 @@
       document.getElementById('formContainer').style.display = 'block';
     }
 
-    // Initialiser Flatpickr avec le format français
+    // Initialise Flatpickr avec la locale française et format jj/mm/aaaa
     flatpickr("#date", {
-      dateFormat: "d/m/Y", // Format français : jour/mois/année
+      dateFormat: "d/m/Y",
       defaultDate: "today",
       locale: "fr"
     });
 
+    // Événements
+    document.getElementById('btnAjouter').addEventListener('click', toggleForm);
+    document.getElementById('btnValider').addEventListener('click', validerFiche);
+    document.getElementById('btnSupprimer').addEventListener('click', supprimerFiche);
+    document.getElementById('btnSupprimerTous').addEventListener('click', supprimerTousTravaux);
+
     // Affichage initial
     afficherTravaux();
   </script>
+
 </body>
 </html>
