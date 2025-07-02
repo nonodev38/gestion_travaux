@@ -245,6 +245,14 @@
       }
     }
 
+    function supprimerTousTravaux() {
+      if (confirm("❗ Cette action supprimera tous les travaux enregistrés dans le navigateur. Êtes-vous sûr ?")) {
+        localStorage.removeItem('travaux');
+        afficherTravaux();
+        alert("Tous les travaux ont été supprimés !");
+      }
+    }    
+
     function modifierFiche(id) {
       const f = travaux.find(t => t.id === id);
       if (!f) return;
@@ -274,13 +282,13 @@
     }
 
     function importerTravaux() {
-  const input = document.getElementById('importFile');
-  const file = input.files[0];
-  if (!file) {
-    alert("Veuillez sélectionner un fichier .txt à importer.");
-    return;
-  }
-      
+    const input = document.getElementById('importFile');
+    const file = input.files[0];
+    if (!file) {
+      alert("Veuillez sélectionner un fichier .txt à importer.");
+      return;
+    }
+
   const reader = new FileReader();
   reader.onload = function (e) {
     const contenu = e.target.result;
