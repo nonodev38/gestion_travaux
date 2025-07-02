@@ -97,6 +97,9 @@
 
   <button class="btn-ajouter" onclick="toggleForm()">+ Ajouter Une Fiche</button>
   <button class="btn-ajouter" onclick="exporterTravaux()">📤 Exporter les travaux en .txt</button>
+  <input type="file" id="importFile" accept=".txt" />
+  <button onclick="importerTravaux()">📂 Importer Travaux</button>
+
 
   <div class="form-container" id="formContainer">
     <input type="hidden" id="ficheId" />
@@ -264,6 +267,61 @@
       a.click();
       document.body.removeChild(a);
     }
+
+    function importerTravaux() {
+  const input = document.getElementById('importFile');
+  const file = input.files[0];
+  if (!file) {
+    alert("Veuillez sélectionner un fichier .txt à importer.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const contenu = e.target.result;
+    const lignes = contenu.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+    let travauxLocal = JSON.parse(localStorage.getItem('travaux')) || [];
+    const idsExistants = new Set(travauxLocal.map(t => t.id));
+    let maxId = travauxLocal.reduce((max, t) => Math.max(max, t.id || 0), 0);
+
+    lignes.forEach(ligne => {
+      const parts = ligne.split(',');
+      if (parts.length < 7) return;
+
+      let id = parseInt(parts[0], 10);
+      const dateAjout = parts[1].trim();
+      const type = parts[2].trim();
+      const numero = parts[3].trim();
+      const famille = parts[4].trim();
+      const precision = parts[5].trim();
+      const dateSelection = parts[6].trim();
+
+      if (idsExistants.has(id)) {
+        id = ++maxId; // attribuer un nouvel ID unique
+      }
+
+      travauxLocal.push({
+        id,
+        dateAjout,
+        type,
+        numero,
+        famille,
+        precision,
+        dateSelection
+      });
+
+      idsExistants.add(id);
+    });
+
+    localStorage.setItem('travaux', JSON.stringify(travauxLocal));
+    afficherTravaux();
+    alert("Importation terminée !");
+  };
+
+  reader.readAsText(file);
+}
+    
 
     // init
     afficherTravaux();
