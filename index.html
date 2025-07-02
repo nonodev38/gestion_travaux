@@ -2,11 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>📋 Gestion Travaux</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <title>📋 Gestion Travaux avec Import/Export</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
   <style>
+    /* (Style inchangé, identique à ce que j'ai déjà fourni) */
     body {
       font-family: Arial, sans-serif;
       margin: 2rem;
@@ -113,11 +114,24 @@
       padding-left: 32px;
       width: 100%;
     }
+    #importExportSection {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    #importExportSection button {
+      margin: 0 1rem;
+    }
   </style>
 </head>
 <body>
 
-  <h1>📋 Gestion des Travaux</h1>
+  <h1>📋 Gestion des Travaux avec Import/Export</h1>
+
+  <div id="importExportSection">
+    <input type="file" id="importFile" accept=".txt" style="display:none" />
+    <button id="btnImport">⬆ Importer bdTravaux.txt</button>
+    <button id="btnExport">⬇ Exporter bdTravaux.txt</button>
+  </div>
 
   <div style="text-align:center; margin-bottom:1rem;">
     <button id="btnAjouter">➕ Ajouter un travail</button>
@@ -166,14 +180,14 @@
   <script>
     let travaux = JSON.parse(localStorage.getItem('travaux')) || [];
 
-    // Fonction pour parser une date au format dd/mm/yyyy en objet Date
+    // Parse une date jj/mm/aaaa en Date
     function parseDateDDMMYYYY(str) {
       if (!str) return null;
       const [d, m, y] = str.split('/');
       return new Date(`${y}-${m}-${d}T00:00:00`);
     }
 
-    // Affiche la liste des travaux triée par date sélectionnée
+    // Affiche la liste triée
     function afficherTravaux() {
       travaux.sort((a, b) => {
         const dateA = parseDateDDMMYYYY(a.dateSelection);
@@ -218,12 +232,22 @@
       });
     }
 
-    // Affiche ou cache le formulaire, initialise la date du jour si affiché
+    // Vide formulaire
+    function clearForm() {
+      document.getElementById('ficheId').value = '';
+      document.getElementById('type').value = 'MH';
+      document.getElementById('numero').value = '';
+      document.getElementById('famille').value = 'Deco';
+      document.getElementById('precision').value = '';
+      document.getElementById('date').value = '';
+      document.getElementById('btnSupprimer').style.display = 'none';
+    }
+
+    // Affiche ou cache formulaire + initialise date au besoin
     function toggleForm() {
       const form = document.getElementById('formContainer');
-      const isCurrentlyHidden = form.style.display === 'none' || !form.style.display;
-
-      if (isCurrentlyHidden) {
+      const isHidden = form.style.display === 'none' || !form.style.display;
+      if (isHidden) {
         form.style.display = 'block';
         clearForm();
         const dateInput = document.getElementById('date');
@@ -238,18 +262,7 @@
       }
     }
 
-    // Vide le formulaire et cache bouton supprimer
-    function clearForm() {
-      document.getElementById('ficheId').value = '';
-      document.getElementById('type').value = 'MH';
-      document.getElementById('numero').value = '';
-      document.getElementById('famille').value = 'Deco';
-      document.getElementById('precision').value = '';
-      document.getElementById('date').value = '';
-      document.getElementById('btnSupprimer').style.display = 'none';
-    }
-
-    // Valide l'ajout ou la modification de fiche
+    // Valide ajout ou modif
     function validerFiche() {
       const id = document.getElementById('ficheId').value;
       const type = document.getElementById('type').value;
@@ -265,7 +278,7 @@
       }
 
       if (id) {
-        // Modification
+        // Modifier
         const i = travaux.findIndex(t => t.id == id);
         if (i !== -1) {
           travaux[i] = {
@@ -274,12 +287,12 @@
             numero,
             famille,
             precision,
-            dateAjout: travaux[i].dateAjout, // garder la date d'ajout initiale
+            dateAjout: travaux[i].dateAjout,
             dateSelection
           };
         }
       } else {
-        // Ajout
+        // Ajouter
         const newId = travaux.length ? Math.max(...travaux.map(t => t.id)) + 1 : 1;
         travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
       }
@@ -289,7 +302,7 @@
       toggleForm();
     }
 
-    // Supprime une fiche sélectionnée
+    // Supprimer fiche
     function supprimerFiche() {
       const id = document.getElementById('ficheId').value;
       if (confirm("Supprimer cette fiche ?")) {
@@ -300,7 +313,7 @@
       }
     }
 
-    // Supprime toutes les fiches
+    // Supprimer tous
     function supprimerTousTravaux() {
       if (confirm("❗ Cette action supprimera tous les travaux enregistrés dans le navigateur. Êtes-vous sûr ?")) {
         localStorage.removeItem('travaux');
@@ -310,7 +323,7 @@
       }
     }
 
-    // Charge une fiche dans le formulaire pour modification
+    // Modifier fiche existante
     function modifierFiche(id) {
       const f = travaux.find(t => t.id === id);
       if (!f) return;
@@ -324,7 +337,81 @@
       document.getElementById('formContainer').style.display = 'block';
     }
 
-    // Initialise Flatpickr avec la locale française et format jj/mm/aaaa
+    // --- Importer bdTravaux.txt ---
+    function importerFichier(file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const text = e.target.result;
+        const lignes = text.split(/\r?\n/).filter(l => l.trim() !== '');
+
+        // Trouver max id actuel
+        let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
+
+        let importCount = 0;
+        lignes.forEach(line => {
+          const parts = line.split('|');
+          if (parts.length >= 7) {
+            let [id, type, numero, famille, precision, dateAjout, dateSelection] = parts;
+
+            // Convertir id en number et éviter doublons
+            id = Number(id);
+            if (isNaN(id)) return; // ignore ligne mal formée
+
+            // Si id existe déjà, on modifie l'id en incrémentant
+            if (travaux.some(t => t.id === id)) {
+              maxId++;
+              id = maxId;
+            } else if (id > maxId) {
+              maxId = id;
+            }
+
+            // Ajouter la fiche importée
+            travaux.push({
+              id,
+              type,
+              numero,
+              famille,
+              precision,
+              dateAjout,
+              dateSelection
+            });
+            importCount++;
+          }
+        });
+
+        localStorage.setItem('travaux', JSON.stringify(travaux));
+        afficherTravaux();
+        alert(`Import terminé : ${importCount} fiches ajoutées.`);
+      };
+      reader.readAsText(file);
+    }
+
+    // --- Exporter bdTravaux.txt ---
+    function exporterFichier() {
+      if (travaux.length === 0) {
+        alert("Aucun travail à exporter.");
+        return;
+      }
+      // Générer texte au format id|type|numero|famille|precision|dateAjout|dateSelection
+      const lines = travaux.map(t => 
+        [t.id, t.type, t.numero, t.famille, t.precision, t.dateAjout, t.dateSelection].join('|')
+      );
+
+      const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bdTravaux.txt';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 0);
+    }
+
+    // Initialise Flatpickr en français
     flatpickr("#date", {
       dateFormat: "d/m/Y",
       defaultDate: "today",
@@ -336,6 +423,17 @@
     document.getElementById('btnValider').addEventListener('click', validerFiche);
     document.getElementById('btnSupprimer').addEventListener('click', supprimerFiche);
     document.getElementById('btnSupprimerTous').addEventListener('click', supprimerTousTravaux);
+
+    // Import / Export events
+    const importFileInput = document.getElementById('importFile');
+    document.getElementById('btnImport').addEventListener('click', () => importFileInput.click());
+    importFileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        importerFichier(e.target.files[0]);
+        e.target.value = ''; // reset input
+      }
+    });
+    document.getElementById('btnExport').addEventListener('click', exporterFichier);
 
     // Affichage initial
     afficherTravaux();
