@@ -202,7 +202,7 @@
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
-        dateInput.value = `${dd}-${mm}-${yyyy}`;
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
       } else {
         // On ferme le formulaire
         form.style.display = 'none';
