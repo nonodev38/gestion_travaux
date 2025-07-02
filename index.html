@@ -276,17 +276,7 @@
     alert("Veuillez sélectionner un fichier .txt à importer.");
     return;
   }
-
-function supprimerTousTravaux() {
-  if (confirm("❗ Cette action supprimera tous les travaux enregistrés dans le navigateur. Êtes-vous sûr ?")) {
-    localStorage.removeItem('travaux');
-    afficherTravaux();
-    alert("Tous les travaux ont été supprimés !");
-  }
-}
       
-      
-
   const reader = new FileReader();
   reader.onload = function (e) {
     const contenu = e.target.result;
