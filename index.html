@@ -10,11 +10,9 @@
       background: #f9f9f9;
       color: #333;
     }
-
     h2 {
       margin-bottom: 1rem;
     }
-
     ul {
       list-style-type: none;
       padding: 0;
@@ -24,29 +22,24 @@
       background: #fff;
       border-radius: 6px;
     }
-
     li {
       padding: 12px 16px;
       border-bottom: 1px solid #eee;
     }
-
     li:last-child {
       border-bottom: none;
     }
-
     .title {
       font-weight: bold;
       font-size: 2em;
       margin-bottom: 4px;
       color: #007acc;
     }
-
     .subtitle {
-      font-size: 1.4em;
+      font-size: 1.2em;
       color: #555;
       white-space: pre-wrap;
     }
-
     .btn-ajouter {
       margin-bottom: 1rem;
       padding: 10px 16px;
@@ -56,7 +49,6 @@
       border-radius: 5px;
       cursor: pointer;
     }
-
     .form-container {
       display: none;
       margin-bottom: 1.5rem;
@@ -65,12 +57,10 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-
     .form-container label {
       display: block;
       margin: 0.5rem 0 0.2rem;
     }
-
     .form-container input,
     .form-container select {
       width: 100%;
@@ -79,11 +69,22 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-
     .form-container button {
       padding: 8px 12px;
+      margin-right: 8px;
       background: #28a745;
       color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .form-container button.delete {
+      background: #dc3545;
+    }
+    .modifier-btn {
+      margin-top: 8px;
+      padding: 6px;
+      background: #ffc107;
       border: none;
       border-radius: 4px;
       cursor: pointer;
@@ -92,11 +93,14 @@
 </head>
 <body>
 
-  <h2>📋 Liste Travaux A Effectuer</h2>
+  <h2>📋 Liste Travaux à Effectuer</h2>
 
   <button class="btn-ajouter" onclick="toggleForm()">+ Ajouter Une Fiche</button>
+  <button class="btn-ajouter" onclick="exporterTravaux()">📤 Exporter les travaux en .txt</button>
 
   <div class="form-container" id="formContainer">
+    <input type="hidden" id="ficheId" />
+
     <label for="type">Type</label>
     <select id="type">
       <option value="MH">MH</option>
@@ -124,125 +128,139 @@
     <label for="precision">Précision des travaux</label>
     <input type="text" id="precision" placeholder="Précision des travaux" />
 
-    <label for="date">Date</label>
+    <label for="date">Date sélectionnée</label>
     <input type="date" id="date" />
 
-    <button onclick="ajouterFiche()">Ajouter</button>
+    <button onclick="validerFiche()">Valider</button>
+    <button class="delete" id="btnSupprimer" onclick="supprimerFiche()" style="display:none;">Supprimer</button>
   </div>
 
   <ul id="travauxList"></ul>
 
   <script>
-    const travauxList = document.getElementById('travauxList');
-    const formContainer = document.getElementById('formContainer');
-
-    function toggleForm() {
-      formContainer.style.display = formContainer.style.display === 'none' ? 'block' : 'none';
-    }
+    let travaux = JSON.parse(localStorage.getItem('travaux')) || [];
 
     function parseDateDDMMYYYY(str) {
-      const [day, month, year] = str.split('-');
-      return new Date(`${year}-${month}-${day}`);
+      const [y, m, d] = str.split('-');
+      return new Date(`${y}-${m}-${d}`);
     }
 
-    function afficherTravaux(contenu) {
-      let lines = contenu.split('\n').filter(line => line.trim().length > 0);
+    function afficherTravaux() {
+      travaux.sort((a, b) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection));
+      const list = document.getElementById('travauxList');
+      list.innerHTML = '';
 
-      lines.sort((a, b) => {
-        const partsA = a.split(',');
-        const partsB = b.split(',');
-
-        const dateStrA = partsA[7]?.trim();
-        const dateStrB = partsB[7]?.trim();
-
-        const dateA = dateStrA ? parseDateDDMMYYYY(dateStrA) : null;
-        const dateB = dateStrB ? parseDateDDMMYYYY(dateStrB) : null;
-
-        if (!dateA && !dateB) return 0;
-        if (!dateA) return 1;
-        if (!dateB) return -1;
-
-        return dateA - dateB;
-      });
-
-      travauxList.innerHTML = '';
-
-      lines.forEach(line => {
-        const parts = line.split(',');
-        if (parts.length < 7) return;
-
-        const titleText = `${parts[1].trim()} ${parts[2].trim()}`;
-
-        const subtitleParts = parts.slice(3, 8).filter(p =>
-          p && p.trim() !== '' && p.trim().toLowerCase() !== 'null' && p.trim().toLowerCase() !== 'undefined'
-        );
-
-        const subtitleText = subtitleParts.join(' | ');
-
+      travaux.forEach(item => {
         const li = document.createElement('li');
+
         const title = document.createElement('div');
         title.className = 'title';
-        title.textContent = titleText;
+        title.textContent = `${item.type} ${item.numero}`;
 
         const subtitle = document.createElement('div');
         subtitle.className = 'subtitle';
-        subtitle.textContent = subtitleText;
+        subtitle.textContent = [item.famille, item.precision, item.dateAjout, item.dateSelection].filter(Boolean).join(' | ');
+
+        const btnModif = document.createElement('button');
+        btnModif.className = 'modifier-btn';
+        btnModif.textContent = '✏️ Modifier';
+        btnModif.onclick = () => modifierFiche(item.id);
 
         li.appendChild(title);
-        if (subtitleText) li.appendChild(subtitle);
+        li.appendChild(subtitle);
+        li.appendChild(btnModif);
 
-        travauxList.appendChild(li);
+        list.appendChild(li);
       });
     }
 
-function ajouterFiche() {
-  const type = document.getElementById('type').value.trim();
-  const numero = document.getElementById('numero').value.trim();
-  const famille = document.getElementById('famille').value.trim();
-  const precision = document.getElementById('precision').value.trim();
-  const dateInput = document.getElementById('date').value;
-
-  if (!numero) {
-    alert("Le champ 'Numéro' est requis.");
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('type', type);
-  formData.append('numero', numero);
-  formData.append('famille', famille);
-  formData.append('precision', precision);
-  formData.append('date', dateInput);
-
-  fetch('ajouterFiche.php', {
-    method: 'POST',
-    body: formData
-  })
-  .then(response => response.text())
-  .then(result => {
-    if (result.trim() === "OK") {
-      alert("Fiche ajoutée avec succès !");
-      location.reload(); // recharge la page pour recharger les données
-    } else {
-      alert("Erreur lors de l'ajout : " + result);
+    function toggleForm() {
+      const form = document.getElementById('formContainer');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      if (form.style.display === 'none') clearForm();
     }
-  })
-  .catch(error => {
-    console.error('Erreur réseau :', error);
-    alert("Erreur réseau lors de l'envoi.");
-  });
-}
 
-    fetch('bdTravaux.txt')
-      .then(response => {
-        if (!response.ok) throw new Error("Fichier introuvable");
-        return response.text();
-      })
-      .then(contenu => afficherTravaux(contenu))
-      .catch(error => {
-        console.error('Erreur :', error);
-        travauxList.innerHTML = '<li>Erreur de chargement du fichier bdTravaux.txt.</li>';
-      });
+    function clearForm() {
+      document.getElementById('ficheId').value = '';
+      document.getElementById('type').value = 'MH';
+      document.getElementById('numero').value = '';
+      document.getElementById('famille').value = 'Deco';
+      document.getElementById('precision').value = '';
+      document.getElementById('date').value = '';
+      document.getElementById('btnSupprimer').style.display = 'none';
+    }
+
+    function validerFiche() {
+      const id = document.getElementById('ficheId').value;
+      const type = document.getElementById('type').value;
+      const numero = document.getElementById('numero').value.trim();
+      const famille = document.getElementById('famille').value;
+      const precision = document.getElementById('precision').value.trim();
+      const dateSelection = document.getElementById('date').value;
+      const dateAjout = new Date().toLocaleDateString('fr-FR');
+
+      if (!numero || !dateSelection) {
+        alert("Le numéro et la date sont requis.");
+        return;
+      }
+
+      if (id) {
+        // modification
+        const i = travaux.findIndex(t => t.id == id);
+        travaux[i] = { id: Number(id), type, numero, famille, precision, dateAjout: travaux[i].dateAjout, dateSelection };
+      } else {
+        // ajout
+        const newId = travaux.length ? Math.max(...travaux.map(t => t.id)) + 1 : 1;
+        travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
+      }
+
+      localStorage.setItem('travaux', JSON.stringify(travaux));
+      afficherTravaux();
+      toggleForm();
+      clearForm();
+    }
+
+    function supprimerFiche() {
+      const id = document.getElementById('ficheId').value;
+      if (confirm("Supprimer cette fiche ?")) {
+        travaux = travaux.filter(t => t.id != id);
+        localStorage.setItem('travaux', JSON.stringify(travaux));
+        afficherTravaux();
+        toggleForm();
+        clearForm();
+      }
+    }
+
+    function modifierFiche(id) {
+      const f = travaux.find(t => t.id === id);
+      if (!f) return;
+      document.getElementById('ficheId').value = f.id;
+      document.getElementById('type').value = f.type;
+      document.getElementById('numero').value = f.numero;
+      document.getElementById('famille').value = f.famille;
+      document.getElementById('precision').value = f.precision;
+      document.getElementById('date').value = f.dateSelection;
+      document.getElementById('btnSupprimer').style.display = 'inline-block';
+      document.getElementById('formContainer').style.display = 'block';
+    }
+
+    function exporterTravaux() {
+      const contenu = travaux.map(t =>
+        `${t.id},${t.dateAjout},${t.type},${t.numero},${t.famille},${t.precision},${t.dateSelection}`
+      ).join('\n');
+
+      const blob = new Blob([contenu], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bdTravaux.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // init
+    afficherTravaux();
   </script>
 </body>
 </html>
