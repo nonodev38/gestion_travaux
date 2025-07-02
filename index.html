@@ -89,6 +89,26 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .date-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    
+    .date-wrapper input[type="date"] {
+      padding-left: 36px; /* espace pour l'icône */
+    }
+    
+    .date-wrapper::before {
+      content: "📅";
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1em;
+      pointer-events: none;
+    }
+    
   </style>
 </head>
 <body>
@@ -136,7 +156,9 @@
     <input type="text" id="precision" placeholder="Précision des travaux" />
 
     <label for="date">Date sélectionnée</label>
-    <input type="date" id="date" />
+    <div class="date-wrapper">
+      <input type="date" id="date" />
+    </div>
 
     <button onclick="validerFiche()">Valider</button>
     <button class="delete" id="btnSupprimer" onclick="supprimerFiche()" style="display:none;">Supprimer</button>
