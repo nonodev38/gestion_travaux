@@ -1,20 +1,3 @@
-
-Conversation ouverte. 1 message lu.
-
-Aller au contenu
-Utiliser Gmail avec un lecteur d'écran
-2 sur 413
-Fichiers Camp à transférer
-Boîte de réception
-Bruno Urban <urban.bruno10@gmail.com>
-	
-Pièces jointesmar. 1 juil. 06:58 (il y a 23 heures)
-	
-À moi
-Voici les fichiers .txt du dossier transfertCamp. 
- 6 pièces jointes  • Analyse effectuée par Gmail
-	
-
 5,mh,25,Terrasse,Lames HS,null,
 10,mh,197,Electricité,Tableau Ext,null,déplacer le coffret côté route
 22,mh,22,Plomberie,Fuite Syphon,,exterieur douche
