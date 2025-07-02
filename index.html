@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <title>📋 Gestion Travaux</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/fr.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -89,24 +92,22 @@
       border-radius: 4px;
       cursor: pointer;
     }
-    .date-wrapper {
+    .date-container {
       position: relative;
-      display: inline-block;
-      width: 100%;
+      display: flex;
+      align-items: center;
     }
-    
-    .date-wrapper input[type="date"] {
-      padding-left: 36px; /* espace pour l'icône */
-    }
-    
-    .date-wrapper::before {
-      content: "📅";
+  
+    .date-container .calendar-icon {
       position: absolute;
       left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 1.1em;
+      font-size: 1.2em;
       pointer-events: none;
+    }
+  
+    .date-container input {
+      padding-left: 32px;
+      width: 100%;
     }
     
   </style>
@@ -154,10 +155,11 @@
 
     <label for="precision">Précision des travaux</label>
     <input type="text" id="precision" placeholder="Précision des travaux" />
-
+    
     <label for="date">Date sélectionnée</label>
-    <div class="date-wrapper">
-      <input type="date" id="date" />
+    <div class="date-container">
+      <span class="calendar-icon">📅</span>
+      <input type="text" id="date" placeholder="Sélectionnez une date" />
     </div>
 
     <button onclick="validerFiche()">Valider</button>
@@ -376,6 +378,13 @@
 
     // init
     afficherTravaux();
+
+    // Initialiser Flatpickr avec localisation française
+    flatpickr("#date", {
+      dateFormat: "Y-m-d",
+      defaultDate: "today",
+      locale: "fr"
+    });
   </script>
 </body>
 </html>
