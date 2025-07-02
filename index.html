@@ -207,32 +207,32 @@ function ajouterFiche() {
     return;
   }
 
-  // Format de date : dd-MM-yyyy
-  let formattedDate = '';
-  if (dateInput) {
-    const [year, month, day] = dateInput.split('-');
-    formattedDate = `${day}-${month}-${year}`;
-  }
+  const formData = new FormData();
+  formData.append('type', type);
+  formData.append('numero', numero);
+  formData.append('famille', famille);
+  formData.append('precision', precision);
+  formData.append('date', dateInput);
 
-  // Format CSV simulé : id, type, numero, famille, precision, ?, ?, date, ?
-  const ligne = `0,${type},${numero},${famille},${precision},,,${formattedDate},`;
-
-  // Ajout en haut de la liste
-  const lignesExistantes = Array.from(travauxList.querySelectorAll("li")).map(li => {
-    const title = li.querySelector('.title')?.textContent || '';
-    const subtitle = li.querySelector('.subtitle')?.textContent || '';
-    return `0,${title.replace(/\s+/, ',')},${subtitle.split(' | ').join(',')}`;
+  fetch('ajouterFiche.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.text())
+  .then(result => {
+    if (result.trim() === "OK") {
+      alert("Fiche ajoutée avec succès !");
+      location.reload(); // recharge la page pour recharger les données
+    } else {
+      alert("Erreur lors de l'ajout : " + result);
+    }
+  })
+  .catch(error => {
+    console.error('Erreur réseau :', error);
+    alert("Erreur réseau lors de l'envoi.");
   });
-
-  afficherTravaux([ligne, ...lignesExistantes].join('\n'));
-  alert("Fiche ajoutée (non sauvegardée dans le fichier réel).");
-
-  // Réinitialisation
-  document.getElementById('numero').value = '';
-  document.getElementById('precision').value = '';
-  document.getElementById('date').value = '';
-  toggleForm();
 }
+
     fetch('bdTravaux.txt')
       .then(response => {
         if (!response.ok) throw new Error("Fichier introuvable");
