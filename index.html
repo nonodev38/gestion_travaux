@@ -196,13 +196,14 @@
       const type = document.getElementById('type').value.trim();
       const numero = document.getElementById('numero').value.trim();
       const famille = document.getElementById('famille').value.trim();
+      const precision = document.getElementById('precision').value.trim();
 
       if (!numero) {
         alert("Le champ 'Numéro' est requis.");
         return;
       }
 
-      const ligne = `0,${type},${numero},${famille},,,,,`;
+      const ligne = `0,${type},${numero},${famille},${precision},,,,,`;
       afficherTravaux(ligne + '\n' + travauxList.innerText); // Simule l’ajout
       alert("Fiche ajoutée (non sauvegardée dans le fichier réel).");
 
