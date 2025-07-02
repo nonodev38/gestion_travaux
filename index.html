@@ -175,6 +175,12 @@
     </div>
   </div>
 
+    <input
+    type="text"
+    id="rechercheInput"
+    placeholder="🔍 Rechercher un travail..."
+    style="width: 100%; padding: 10px; margin: 1rem 0; border: 1px solid #ccc; border-radius: 6px;"
+  />
   <ul id="travauxList"></ul>
 
   <script>
@@ -187,13 +193,55 @@
       return new Date(`${y}-${m}-${d}T00:00:00`);
     }
 
-    // Affiche la liste triée
-    function afficherTravaux() {
-      travaux.sort((a, b) => {
-        const dateA = parseDateDDMMYYYY(a.dateSelection);
-        const dateB = parseDateDDMMYYYY(b.dateSelection);
-        return dateA - dateB;
-      });
+// Affiche la liste triée et filtrée si besoin avec la zone de recherche
+function afficherTravaux(filtre = '') {
+  const list = document.getElementById('travauxList');
+  list.innerHTML = '';
+
+  const recherche = filtre.trim().toLowerCase();
+
+  const travauxFiltres = travaux
+    .sort((b, a) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection))
+    .filter(item => {
+      const chaine = `${item.type} ${item.numero} ${item.famille} ${item.precision} ${item.dateAjout} ${item.dateSelection}`;
+      return chaine.toLowerCase().includes(recherche);
+    });
+
+  travauxFiltres.forEach(item => {
+    const li = document.createElement('li');
+
+    const title = document.createElement('div');
+    title.className = 'title';
+    title.textContent = `${item.type} ${item.numero}`;
+
+    const subtitle = document.createElement('div');
+    subtitle.className = 'subtitle';
+    const formatFr = d => d ? new Date(d).toLocaleDateString('fr-FR') : '';
+    subtitle.textContent = [
+      item.famille,
+      item.precision,
+      item.dateAjout,
+      formatFr(item.dateSelection)
+    ].filter(Boolean).join(' | ');
+
+    const btnModif = document.createElement('button');
+    btnModif.className = 'modifier-btn';
+    btnModif.textContent = '✏️ Modifier';
+    btnModif.onclick = () => modifierFiche(item.id);
+
+    li.appendChild(title);
+    li.appendChild(subtitle);
+    li.appendChild(btnModif);
+
+    list.appendChild(li);
+  });
+}
+
+    document.getElementById('rechercheInput').addEventListener('input', function () {
+  afficherTravaux(this.value);
+});
+
+
 
       const list = document.getElementById('travauxList');
       list.innerHTML = '';
