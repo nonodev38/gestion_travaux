@@ -172,6 +172,7 @@
   <div id="importExportSection">
 	<input type="file" id="importFile" accept=".txt" style="display:none" />
 	<button id="btnImport">⬆ Importer bdTravaux.txt</button>
+	<button id="btnImportAndroid">⬆ Importer bdTravauxAndroid</button>
 	<button id="btnExport">⬇ Exporter bdTravaux.txt</button>
   </div>
 
@@ -384,6 +385,44 @@
       };
       reader.readAsText(file);
     }
+	
+	function importerFichierAndroid(file) {
+	  const reader = new FileReader();
+	  reader.onload = e => {
+		const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+		let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
+		let count = 0;
+		const today = new Date().toLocaleDateString('fr-FR');
+
+		for (let l of lines) {
+		  const [id, type, num, famille, sousfamille, autre, dateSelection] = l.split('|');
+		  if (type && num && dateSelection) {
+			let newId = Number(id);
+			if (isNaN(newId) || travaux.some(t => t.id === newId)) {
+			  maxId++;
+			  newId = maxId;
+			}
+			const precision = [sousfamille, autre].filter(Boolean).join(' ').trim();
+			travaux.push({
+			  id: newId,
+			  type,
+			  numero: num,
+			  famille,
+			  precision,
+			  dateAjout: today,
+			  dateSelection
+			});
+			count++;
+		  }
+		}
+
+		localStorage.setItem('travaux', JSON.stringify(travaux));
+		afficherTravaux();
+		alert(`${count} fiches Android importées.`);
+	  };
+	  reader.readAsText(file);
+	}
+
 
     function exporterFichier() {
       if (!travaux.length) return alert("Aucun travail à exporter.");
@@ -482,8 +521,23 @@
         e.target.value = '';
       }
     });
+	
+	document.getElementById('btnImportAndroid').onclick = () => document.getElementById('importFile').click();
+	document.getElementById('importFile').addEventListener('change', e => {
+	  if (e.target.files[0]) {
+		const isAndroidImport = document.activeElement.id === 'btnImportAndroid';
+		if (isAndroidImport) {
+		  importerFichierAndroid(e.target.files[0]);
+		} else {
+		  importerFichier(e.target.files[0]);
+		}
+		e.target.value = '';
+	  }
+	});
+
     document.getElementById('btnExport').onclick = exporterFichier;
     document.getElementById('rechercheInput').addEventListener('input', e => afficherTravaux(e.target.value));
+	
 
     afficherTravaux();
 	chargerListeARealiser();
