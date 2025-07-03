@@ -205,8 +205,11 @@
 	  <option value="Autre">Autre</option>
 	</select>
 
+
 	<label for="precision">Précision</label>
-	<input type="text" id="precision" placeholder="Précisions Travaux" />
+	<input type="text" id="precision" list="precision-list" placeholder="Précisions Travaux" />
+	<datalist id="precision-list"></datalist>
+
 	
 	<label for="date">Date sélectionnée</label>
 	<div class="date-container">
@@ -445,6 +448,23 @@
 
 	  chargerListeARealiser();
 	}
+	
+		  // Chargement de bdTravaux depuis le localStorage
+	  const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
+
+	  // Récupération des parts[4] uniques
+	  const precisions = [...new Set(bdTravaux.map(item => {
+		const parts = item.split("§");
+		return parts[4] || ""; // éviter undefined
+	  }).filter(p => p.trim() !== ""))]; // on filtre les vides
+
+	  // Remplir la datalist
+	  const datalist = document.getElementById("precision-list");
+	  precisions.forEach(p => {
+		const option = document.createElement("option");
+		option.value = p;
+		datalist.appendChild(option);
+	  });
 
 
 
