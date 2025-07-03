@@ -9,23 +9,22 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 2rem;
+      margin: 2rem auto;
       background: #f9f9f9;
       color: #333;
       max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
     }
     h1 {
       text-align: center;
-      margin-bottom: 1rem;
     }
-    .form-container {
-      border: 1px solid #ddd;
+    .form-container, .liste-realisation {
       background: #fff;
+      border: 1px solid #ccc;
       padding: 1rem;
       border-radius: 6px;
       box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .form-container {
       display: none;
     }
     label {
@@ -64,8 +63,6 @@
       color: white;
       margin: 0 0.5rem 1rem 0.5rem;
     }
-	
-	
     #travauxList {
       list-style: none;
       padding: 0;
@@ -88,39 +85,21 @@
       font-size: 0.9rem;
       color: #666;
     }
-	
-	
-	.date-container {
-	  position: relative;
-	  display: flex;
-	  align-items: center;
-	  width: 100%;
-	  max-width: 300px; /* ajustable */
-	}
-
-	.calendar-icon {
-	  position: absolute;
-	  left: 10px;
-	  font-size: 1.2em;
-	  pointer-events: none;
-	  color: #555;
-	}
-
-	.date-container input {
-	  width: 100%;
-	  padding: 10px 10px 10px 35px; /* espace à gauche pour l’icône */
-	  border: 1px solid #ccc;
-	  border-radius: 4px;
-	  box-sizing: border-box;
-	}
-
-	
-	
-    #importExportSection {
-      text-align: center;
-      margin-bottom: 2rem;
+    .date-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      max-width: 300px;
     }
-	
+    .calendar-icon {
+      position: absolute;
+      left: 10px;
+      font-size: 1.2em;
+      color: #555;
+    }
+    .date-container input {
+      padding-left: 35px;
+    }
     #rechercheInput {
       width: 100%;
       padding: 10px;
@@ -128,365 +107,205 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-	
-	
-		.liste-realisation {
-	  position: fixed;
-	  top: 1rem;
-	  left: 1rem;
-	  background: #fff;
-	  border: 1px solid #ccc;
-	  padding: 0.5rem;
-	  border-radius: 6px;
-	  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-	  z-index: 1000;
-	  max-width: 250px;
-	}
-	.liste-realisation h3 {
-	  margin: 0 0 0.5rem 0;
-	  font-size: 1rem;
-	}
-	.liste-realisation ul {
-	  list-style: none;
-	  padding: 0;
-	  margin: 0;
-	}
-	.liste-realisation li {
-	  font-size: 0.85rem;
-	  margin-bottom: 0.4rem;
-	}
-
-	
-	
+    .liste-realisation {
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      max-width: 250px;
+      z-index: 1000;
+    }
+    .liste-realisation h3 {
+      margin: 0 0 0.5rem;
+    }
+    .liste-realisation li {
+      font-size: 0.85rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-
   <h1>📋 Gestion des Travaux</h1>
-  
- <div class="liste-realisation" id="listeRealisationContainer" style="display:none;">
-  <h3>🛠 À réaliser</h3>
-  <ul id="listeRealisation"></ul>
-</div>
 
-  <div id="importExportSection">
-	<input type="file" id="importFile" accept=".txt" style="display:none" />
-	<button id="btnImport">⬆ Importer bdTravaux.txt</button>
-	<button id="btnExport">⬇ Exporter bdTravaux.txt</button>
+  <div class="liste-realisation" id="listeRealisationContainer" style="display:none;">
+    <h3>🛠 À réaliser</h3>
+    <ul id="listeRealisation"></ul>
   </div>
 
   <div style="text-align:center;">
-	<button id="btnAjouter">➕ Ajouter un travail</button>
-	<button id="btnSupprimerTous">🗑 Supprimer tous les travaux</button>
+    <button id="btnAjouter">➕ Ajouter un travail</button>
+    <button id="btnSupprimerTous">🗑 Supprimer tous les travaux</button>
   </div>
 
   <div class="form-container" id="formContainer">
-	<input type="hidden" id="ficheId" />
-	<label for="type">Type</label>
-	<select id="type">
-	  <option value="MH">MH</option>
-	  <option value="CH">CH</option>
-	  <option value="EMP">EMP</option>
-	  <option value="BAT">BAT</option>
-	  <option value="Autre">Autre</option>
-	</select>
+    <input type="hidden" id="ficheId" />
+    <label for="type">Type</label>
+    <select id="type">
+      <option value="MH">MH</option>
+      <option value="CH">CH</option>
+      <option value="EMP">EMP</option>
+      <option value="BAT">BAT</option>
+      <option value="Autre">Autre</option>
+    </select>
 
-	<label for="numero">Numéro</label>
-	<input type="text" id="numero" placeholder="Numéro" />
+    <label for="numero">Numéro</label>
+    <input type="text" id="numero" placeholder="Numéro" />
 
-	<label for="famille">Famille</label>
-	<select id="famille">
-	  <option value="Casse">Casse</option>
-	  <option value="Deco">Deco</option>
-	  <option value="Plomberie">Plomberie</option>
-	  <option value="Electricité">Electricité</option>
-	  <option value="Terrasse">Terrasse</option>
-	  <option value="Debrousaillage">Débroussaillage</option>
-	  <option value="Autre">Autre</option>
-	</select>
+    <label for="famille">Famille</label>
+    <select id="famille">
+      <option value="Casse">Casse</option>
+      <option value="Deco">Deco</option>
+      <option value="Plomberie">Plomberie</option>
+      <option value="Electricité">Electricité</option>
+      <option value="Terrasse">Terrasse</option>
+      <option value="Debrousaillage">Débroussaillage</option>
+      <option value="Autre">Autre</option>
+    </select>
 
+    <label for="precision">Précision</label>
+    <input type="text" id="precision" list="precision-list" placeholder="Précisions Travaux" />
+    <datalist id="precision-list"></datalist>
 
-	<label for="precision">Précision</label>
-	<input type="text" id="precision" list="precision-list" placeholder="Précisions Travaux" />
-	<datalist id="precision-list"></datalist>
+    <label for="date">Date sélectionnée</label>
+    <div class="date-container">
+      <span class="calendar-icon">📅</span>
+      <input type="text" id="date" placeholder="Sélectionnez une date" />
+    </div>
 
-	
-	<label for="date">Date sélectionnée</label>
-	<div class="date-container">
-	  <span class="calendar-icon">📅</span>
-	  <input type="text" id="date" placeholder="Sélectionnez une date" />
-	</div>
-
-
-	<button id="btnValider">Valider</button>
-	<button id="btnSupprimer">Supprimer</button>
+    <button id="btnValider">Valider</button>
+    <button id="btnSupprimer">Supprimer</button>
   </div>
 
   <input type="text" id="rechercheInput" placeholder="🔍 Rechercher un travail..." />
-
   <ul id="travauxList"></ul>
 
   <script>
-    let travaux = JSON.parse(localStorage.getItem('travaux')) || [];
-
-    const parseDateDDMMYYYY = str => {
-      if (!str) return null;
-      const [d, m, y] = str.split('/');
-      return new Date(`${y}-${m}-${d}`);
-    };
+    const travaux = JSON.parse(localStorage.getItem("travaux")) || [];
 
     function afficherTravaux(filtre = '') {
-      const list = document.getElementById('travauxList');
+      const list = document.getElementById("travauxList");
       list.innerHTML = '';
-      const recherche = filtre.trim().toLowerCase();
+      const recherche = filtre.toLowerCase();
 
       travaux
-        .sort((a, b) => parseDateDDMMYYYY(b.dateSelection) - parseDateDDMMYYYY(a.dateSelection))
-        .filter(t => {
-          const txt = `${t.type} ${t.numero} ${t.famille} ${t.precision} ${t.dateAjout} ${t.dateSelection}`.toLowerCase();
-          return txt.includes(recherche);
-        })
+        .filter(t => `${t.type} ${t.numero} ${t.famille} ${t.precision}`.toLowerCase().includes(recherche))
         .forEach(item => {
-          const li = document.createElement('li');
-          const title = document.createElement('div');
-          title.className = 'title';
+          const li = document.createElement("li");
+          const title = document.createElement("div");
+          title.className = "title";
           title.textContent = `${item.type} ${item.numero}`;
 
-          const subtitle = document.createElement('div');
-          subtitle.className = 'subtitle';
+          const subtitle = document.createElement("div");
+          subtitle.className = "subtitle";
           subtitle.textContent = `${item.famille} | ${item.precision} | ${item.dateAjout} | ${item.dateSelection}`;
 
-          const btn = document.createElement('button');
-          btn.textContent = '✏️ Modifier';
+          const btn = document.createElement("button");
+          btn.textContent = "✏️ Modifier";
           btn.onclick = () => modifierFiche(item.id);
 
-          const div = document.createElement('div');
-          div.appendChild(title);
-          div.appendChild(subtitle);
+          li.onclick = e => {
+            if (e.target.tagName !== 'BUTTON') ajouterDansListeARealiser(item);
+          };
 
-			li.onclick = (e) => {
-			  if (e.target.tagName !== 'BUTTON') {
-				ajouterDansListeARealiser(item);
-			  }
-			};
-
-          li.appendChild(div);
+          li.appendChild(title);
+          li.appendChild(subtitle);
           li.appendChild(btn);
           list.appendChild(li);
         });
     }
 
-    function clearForm() {
-      document.getElementById('ficheId').value = '';
-      document.getElementById('type').value = 'MH';
-      document.getElementById('numero').value = '';
-      document.getElementById('famille').value = 'Deco';
-      document.getElementById('precision').value = '';
-      document.getElementById('date').value = '';
-      document.getElementById('btnSupprimer').style.display = 'none';
-    }
-
-    function toggleForm() {
-      const form = document.getElementById('formContainer');
-      const visible = form.style.display === 'block';
-      form.style.display = visible ? 'none' : 'block';
-      if (!visible) {
-        clearForm();
-        const today = new Date();
-        const dd = String(today.getDate()).padStart(2, '0');
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        document.getElementById('date').value = `${dd}/${mm}/${yyyy}`;
-      }
-    }
-
     function validerFiche() {
-      const id = document.getElementById('ficheId').value;
-      const type = document.getElementById('type').value;
-      const numero = document.getElementById('numero').value.trim();
-      const famille = document.getElementById('famille').value;
-      const precision = document.getElementById('precision').value.trim();
-      const dateSelection = document.getElementById('date').value;
-      const dateAjout = new Date().toLocaleDateString('fr-FR');
+      const id = document.getElementById("ficheId").value;
+      const type = document.getElementById("type").value;
+      const numero = document.getElementById("numero").value;
+      const famille = document.getElementById("famille").value;
+      const precision = document.getElementById("precision").value;
+      const date = document.getElementById("date").value;
+      const dateAjout = new Date().toLocaleDateString("fr-FR");
 
-      if (!numero || !dateSelection) {
-        alert('Numéro et date requis.');
-        return;
-      }
+      if (!numero || !date) return alert("Champs requis");
+
+      const nouveau = { id: id || Date.now(), type, numero, famille, precision, dateSelection: date, dateAjout };
 
       if (id) {
-        const i = travaux.findIndex(t => t.id == id);
-        if (i >= 0) {
-          travaux[i] = { id: Number(id), type, numero, famille, precision, dateAjout: travaux[i].dateAjout, dateSelection };
-        }
+        const idx = travaux.findIndex(t => t.id == id);
+        if (idx !== -1) travaux[idx] = nouveau;
       } else {
-        const newId = travaux.length ? Math.max(...travaux.map(t => t.id)) + 1 : 1;
-        travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
+        travaux.push(nouveau);
       }
 
-      localStorage.setItem('travaux', JSON.stringify(travaux));
+      localStorage.setItem("travaux", JSON.stringify(travaux));
       afficherTravaux();
-      toggleForm();
-    }
-
-    function supprimerFiche() {
-      const id = document.getElementById('ficheId').value;
-      if (confirm("Supprimer cette fiche ?")) {
-        travaux = travaux.filter(t => t.id != id);
-        localStorage.setItem('travaux', JSON.stringify(travaux));
-        afficherTravaux();
-        toggleForm();
-      }
+      document.getElementById("formContainer").style.display = "none";
     }
 
     function modifierFiche(id) {
-      const f = travaux.find(t => t.id === id);
-      if (!f) return;
-      document.getElementById('ficheId').value = f.id;
-      document.getElementById('type').value = f.type;
-      document.getElementById('numero').value = f.numero;
-      document.getElementById('famille').value = f.famille;
-      document.getElementById('precision').value = f.precision;
-      document.getElementById('date').value = f.dateSelection;
-      document.getElementById('btnSupprimer').style.display = 'inline-block';
-      document.getElementById('formContainer').style.display = 'block';
+      const t = travaux.find(tr => tr.id == id);
+      if (!t) return;
+      Object.entries(t).forEach(([k, v]) => {
+        const el = document.getElementById(k);
+        if (el) el.value = v;
+      });
+      document.getElementById("btnSupprimer").style.display = "inline-block";
+      document.getElementById("formContainer").style.display = "block";
     }
 
     function supprimerTousTravaux() {
-      if (confirm("Tout supprimer ?")) {
-        travaux = [];
-        localStorage.removeItem('travaux');
-        afficherTravaux();
+      if (confirm("Confirmer suppression")) {
+        localStorage.removeItem("travaux");
+        location.reload();
       }
     }
 
-    function importerFichier(file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
-        let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
-        let count = 0;
-        for (let l of lines) {
-          const [id, type, numero, famille, precision, dateAjout, dateSelection] = l.split('|');
-          if (type && numero && dateSelection) {
-            let newId = Number(id);
-            if (isNaN(newId) || travaux.some(t => t.id === newId)) {
-              maxId++;
-              newId = maxId;
-            }
-            travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
-            count++;
-          }
-        }
-        localStorage.setItem('travaux', JSON.stringify(travaux));
-        afficherTravaux();
-        alert(`${count} fiches importées.`);
-      };
-      reader.readAsText(file);
+    function ajouterDansListeARealiser(travail) {
+      let liste = JSON.parse(localStorage.getItem("listeTravauxARealiser")) || [];
+      if (!liste.find(t => t.id === travail.id)) {
+        liste.push(travail);
+        localStorage.setItem("listeTravauxARealiser", JSON.stringify(liste));
+        chargerListeARealiser();
+      }
     }
 
-    function exporterFichier() {
-      if (!travaux.length) return alert("Aucun travail à exporter.");
-      const txt = travaux.map(t => [t.id, t.type, t.numero, t.famille, t.precision, t.dateAjout, t.dateSelection].join('|')).join('\n');
-      const blob = new Blob([txt], {type: 'text/plain'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bdTravaux.txt';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+    function chargerListeARealiser() {
+      const liste = JSON.parse(localStorage.getItem("listeTravauxARealiser")) || [];
+      const ul = document.getElementById("listeRealisation");
+      ul.innerHTML = '';
+      if (!liste.length) return document.getElementById("listeRealisationContainer").style.display = "none";
+
+      document.getElementById("listeRealisationContainer").style.display = "block";
+      liste.forEach(t => {
+        const li = document.createElement("li");
+        li.textContent = `${t.type} ${t.numero} (${t.dateSelection})`;
+        li.onclick = () => {
+          const newList = liste.filter(x => x.id !== t.id);
+          localStorage.setItem("listeTravauxARealiser", JSON.stringify(newList));
+          chargerListeARealiser();
+        };
+        ul.appendChild(li);
+      });
     }
-	
-	function chargerListeARealiser() {
-	  const liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
-	  const conteneur = document.getElementById('listeRealisation');
-	  conteneur.innerHTML = '';
 
-	  if (liste.length === 0) {
-		document.getElementById('listeRealisationContainer').style.display = 'none';
-		return;
-	  }
-
-	  document.getElementById('listeRealisationContainer').style.display = 'block';
-
-	  liste.forEach(t => {
-		const li = document.createElement('li');
-		li.textContent = `${t.type} ${t.numero} (${t.dateSelection})`;
-		li.style.cursor = 'pointer';
-		li.title = 'Cliquer pour retirer de la liste';
-		li.onclick = () => retirerDeListeARealiser(t.id);
-		conteneur.appendChild(li);
-	  });
-	}
-
-
-	function ajouterDansListeARealiser(travail) {
-	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
-	  if (!liste.some(t => t.id === travail.id)) {
-		liste.push(travail);
-		localStorage.setItem('listeTravauxARealiser', JSON.stringify(liste));
-		chargerListeARealiser();
-	  }
-	}
-	
-	function retirerDeListeARealiser(id) {
-	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
-	  const elementRetire = liste.find(t => t.id === id);
-
-	  // Supprimer de la liste
-	  liste = liste.filter(t => t.id !== id);
-	  localStorage.setItem('listeTravauxARealiser', JSON.stringify(liste));
-
-	  // Ajouter à bdCorbeille
-	  let corbeille = JSON.parse(localStorage.getItem('bdCorbeille')) || [];
-	  if (elementRetire && !corbeille.some(t => t.id === id)) {
-		corbeille.push(elementRetire);
-		localStorage.setItem('bdCorbeille', JSON.stringify(corbeille));
-	  }
-
-	  chargerListeARealiser();
-	}
-	
-		// Chargement de bdTravaux depuis le localStorage
-	  const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
-	  
-
-	  // Récupération des parts[4] uniques
-	  const precisions = [...new Set(bdTravaux.map(item => {
-		const parts = item.split("§");
-		return parts[4] || ""; // éviter undefined
-	  }).filter(p => p.trim() !== ""))]; // on filtre les vides
-
-	  // Remplir la datalist
-	  const datalist = document.getElementById("precision-list");
-	  precisions.forEach(p => {
-		const option = document.createElement("option");
-		option.value = p;
-		datalist.appendChild(option);
-	  });
-
-
-
-    // Initialisation
+    document.getElementById("btnAjouter").onclick = () => {
+      document.getElementById("formContainer").style.display = "block";
+      document.getElementById("ficheId").value = '';
+    };
+    document.getElementById("btnValider").onclick = validerFiche;
+    document.getElementById("btnSupprimerTous").onclick = supprimerTousTravaux;
+    document.getElementById("rechercheInput").oninput = e => afficherTravaux(e.target.value);
     flatpickr("#date", { dateFormat: "d/m/Y", locale: "fr" });
-    document.getElementById('btnAjouter').onclick = toggleForm;
-    document.getElementById('btnValider').onclick = validerFiche;
-    document.getElementById('btnSupprimer').onclick = supprimerFiche;
-    document.getElementById('btnSupprimerTous').onclick = supprimerTousTravaux;
-    document.getElementById('btnImport').onclick = () => document.getElementById('importFile').click();
-    document.getElementById('importFile').addEventListener('change', e => {
-      if (e.target.files[0]) {
-        importerFichier(e.target.files[0]);
-        e.target.value = '';
-      }
-    });
-    document.getElementById('btnExport').onclick = exporterFichier;
-    document.getElementById('rechercheInput').addEventListener('input', e => afficherTravaux(e.target.value));
 
     afficherTravaux();
-	chargerListeARealiser();
+    chargerListeARealiser();
+
+    // Chargement auto des précisions depuis bdTravaux
+    const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
+    const precisions = [...new Set(bdTravaux.map(l => (l.split("\u00a7")[4] || '').trim()).filter(Boolean))];
+    const datalist = document.getElementById("precision-list");
+    precisions.forEach(p => {
+      const option = document.createElement("option");
+      option.value = p;
+      datalist.appendChild(option);
+    });
   </script>
 </body>
 </html>
