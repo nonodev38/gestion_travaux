@@ -299,6 +299,40 @@
         document.getElementById('date').value = `${dd}/${mm}/${yyyy}`;
       }
     }
+	
+	  const list = document.getElementById('travauxList'); // Liste DOM
+	  const datalist = document.getElementById("precision-list");
+
+	  // Charger les données de localStorage
+	  const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
+
+	  // Nettoyage de la liste visuelle si nécessaire
+	  list.innerHTML = '';
+
+	  // Ensemble pour stocker les précisions uniques
+	  const precisionSet = new Set();
+
+	  // Remplir la liste DOM et collecter parts[4] pour la datalist
+	  bdTravaux.forEach(item => {
+		const parts = item.split("§");
+
+		// Affichage facultatif dans la liste visuelle
+		const li = document.createElement('li');
+		li.textContent = parts.join(' | '); // ou autre rendu
+		list.appendChild(li);
+
+		// Stocker la précision (parts[4]) si elle existe
+		if (parts[4] && parts[4].trim() !== '') {
+		  precisionSet.add(parts[4].trim());
+		}
+	  });
+
+	  // Générer les <option> pour la datalist
+	  precisionSet.forEach(precision => {
+		const option = document.createElement("option");
+		option.value = precision;
+		datalist.appendChild(option);
+	  });
 
     function validerFiche() {
       const id = document.getElementById('ficheId').value;
@@ -449,8 +483,9 @@
 	  chargerListeARealiser();
 	}
 	
-		  // Chargement de bdTravaux depuis le localStorage
+		// Chargement de bdTravaux depuis le localStorage
 	  const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
+	  
 
 	  // Récupération des parts[4] uniques
 	  const precisions = [...new Set(bdTravaux.map(item => {
