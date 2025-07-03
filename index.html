@@ -384,9 +384,13 @@
 	  liste.forEach(t => {
 		const li = document.createElement('li');
 		li.textContent = `${t.type} ${t.numero} (${t.dateSelection})`;
+		li.style.cursor = 'pointer';
+		li.title = 'Cliquer pour retirer de la liste';
+		li.onclick = () => retirerDeListeARealiser(t.id);
 		conteneur.appendChild(li);
 	  });
 	}
+
 
 	function ajouterDansListeARealiser(travail) {
 	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
@@ -396,6 +400,25 @@
 		chargerListeARealiser();
 	  }
 	}
+	
+	function retirerDeListeARealiser(id) {
+	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
+	  const elementRetire = liste.find(t => t.id === id);
+
+	  // Supprimer de la liste
+	  liste = liste.filter(t => t.id !== id);
+	  localStorage.setItem('listeTravauxARealiser', JSON.stringify(liste));
+
+	  // Ajouter à bdCorbeille
+	  let corbeille = JSON.parse(localStorage.getItem('bdCorbeille')) || [];
+	  if (elementRetire && !corbeille.some(t => t.id === id)) {
+		corbeille.push(elementRetire);
+		localStorage.setItem('bdCorbeille', JSON.stringify(corbeille));
+	  }
+
+	  chargerListeARealiser();
+	}
+
 
 
     // Initialisation
