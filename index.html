@@ -383,64 +383,6 @@
       };
       reader.readAsText(file);
     }
-	
-	function importerFichierAndroid(file) {
-	  const reader = new FileReader();
-	  reader.onload = e => {
-		const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
-		let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
-		let count = 0;
-		for (let l of lines) {
-		  const parts = l.split(',');
-		  if (parts.length < 7) continue; // ligne mal formée
-
-		  let [id, type, num, famille, sousfamille, autre, dateSelection] = parts;
-
-		  // Nettoyer les valeurs "null"
-		  sousfamille = (sousfamille && sousfamille.toLowerCase() !== 'null') ? sousfamille.trim() : '';
-		  autre = (autre && autre.toLowerCase() !== 'null') ? autre.trim() : '';
-		  dateSelection = (dateSelection && dateSelection.toLowerCase() !== 'null') ? dateSelection.trim() : '';
-
-		  // Concaténer sousfamille et autre avec espace si les deux présents
-		  let precision = sousfamille;
-		  if (precision && autre) {
-			precision += ' ' + autre;
-		  } else if (!precision && autre) {
-			precision = autre;
-		  }
-
-		  // Date du jour pour dateAjout
-		  const today = new Date();
-		  const dd = String(today.getDate()).padStart(2, '0');
-		  const mm = String(today.getMonth() + 1).padStart(2, '0');
-		  const yyyy = today.getFullYear();
-		  const dateAjout = `${dd}/${mm}/${yyyy}`;
-
-		  let newId = Number(id);
-		  if (isNaN(newId) || travaux.some(t => t.id === newId)) {
-			maxId++;
-			newId = maxId;
-		  }
-
-		  travaux.push({
-			id: newId,
-			type,
-			numero: num,
-			famille,
-			precision,
-			dateAjout,
-			dateSelection
-		  });
-		  count++;
-		}
-		localStorage.setItem('travaux', JSON.stringify(travaux));
-		afficherTravaux();
-		alert(`${count} fiches importées.`);
-	  };
-	  reader.readAsText(file);
-	}
-
-
 
     function exporterFichier() {
       if (!travaux.length) return alert("Aucun travail à exporter.");
