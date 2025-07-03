@@ -64,6 +64,8 @@
       color: white;
       margin: 0 0.5rem 1rem 0.5rem;
     }
+	
+	
     #travauxList {
       list-style: none;
       padding: 0;
@@ -86,16 +88,39 @@
       font-size: 0.9rem;
       color: #666;
     }
-    .date-container {
-      position: relative;
-    }
-    .date-container input {
-      padding-left: 32px;
-    }
+	
+	
+	.date-container {
+	  position: relative;
+	  display: flex;
+	  align-items: center;
+	  width: 100%;
+	  max-width: 300px; /* ajustable */
+	}
+
+	.calendar-icon {
+	  position: absolute;
+	  left: 10px;
+	  font-size: 1.2em;
+	  pointer-events: none;
+	  color: #555;
+	}
+
+	.date-container input {
+	  width: 100%;
+	  padding: 10px 10px 10px 35px; /* espace à gauche pour l’icône */
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  box-sizing: border-box;
+	}
+
+	
+	
     #importExportSection {
       text-align: center;
       margin-bottom: 2rem;
     }
+	
     #rechercheInput {
       width: 100%;
       padding: 10px;
@@ -182,11 +207,13 @@
 
 	<label for="precision">Précision</label>
 	<input type="text" id="precision" placeholder="Précisions Travaux" />
-
+	
 	<label for="date">Date sélectionnée</label>
 	<div class="date-container">
+	  <span class="calendar-icon">📅</span>
 	  <input type="text" id="date" placeholder="Sélectionnez une date" />
 	</div>
+
 
 	<button id="btnValider">Valider</button>
 	<button id="btnSupprimer">Supprimer</button>
