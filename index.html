@@ -359,61 +359,56 @@
         afficherTravaux();
       }
     }
+	  
+function importerFichier(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+    let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
+    let count = 0;
 
-    // --- Importer bdTravaux.txt ---
-    function importerTravaux() {
-    const input = document.getElementById('importFile');
-    const file = input.files[0];
-    if (!file) {
-      alert("Veuillez sélectionner un fichier .txt à importer.");
-      return;
+    for (let l of lines) {
+      const [idStr, type, numero, famille, precision, dateAjout, dateSelection] = l.split('|');
+
+      if (type && numero && dateSelection) {
+        // Vérifier si cette fiche existe déjà (hors id)
+        const ficheExiste = travaux.some(t =>
+          t.type === type &&
+          t.numero === numero &&
+          t.famille === famille &&
+          t.precision === precision &&
+          t.dateAjout === dateAjout &&
+          t.dateSelection === dateSelection
+        );
+        if (ficheExiste) continue; // fiche déjà présente, on saute
+
+        let newId = Number(idStr);
+        if (isNaN(newId) || travaux.some(t => t.id === newId)) {
+          maxId++;
+          newId = maxId;
+        }
+
+        travaux.push({
+          id: newId,
+          type,
+          numero,
+          famille,
+          precision,
+          dateAjout,
+          dateSelection
+        });
+
+        count++;
+      }
     }
 
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const contenu = e.target.result;
-    const lignes = contenu.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-
-    let travauxLocal = JSON.parse(localStorage.getItem('travaux')) || [];
-    const idsExistants = new Set(travauxLocal.map(t => t.id));
-    let maxId = travauxLocal.reduce((max, t) => Math.max(max, t.id || 0), 0);
-
-    lignes.forEach(ligne => {
-      const parts = ligne.split(',');
-      if (parts.length < 7) return;
-
-      let id = parseInt(parts[0], 10);
-      const dateAjout = parts[1].trim();
-      const type = parts[2].trim();
-      const numero = parts[3].trim();
-      const famille = parts[4].trim();
-      const precision = parts[5].trim();
-      const dateSelection = parts[6].trim();
-
-      if (idsExistants.has(id)) {
-        id = ++maxId; // attribuer un nouvel ID unique
-      }
-
-      travauxLocal.push({
-        id,
-        dateAjout,
-        type,
-        numero,
-        famille,
-        precision,
-        dateSelection
-      });
-
-      idsExistants.add(id);
-    });
-
-    localStorage.setItem('travaux', JSON.stringify(travauxLocal));
+    localStorage.setItem('travaux', JSON.stringify(travaux));
     afficherTravaux();
-    alert("Importation terminée !");
+    alert(`${count} nouvelles fiches importées (sans doublons).`);
   };
-
   reader.readAsText(file);
 }
+
 
     function exporterFichier() {
       if (!travaux.length) return alert("Aucun travail à exporter.");
