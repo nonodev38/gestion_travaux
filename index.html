@@ -64,6 +64,8 @@
       color: white;
       margin: 0 0.5rem 1rem 0.5rem;
     }
+	
+	
     #travauxList {
       list-style: none;
       padding: 0;
@@ -86,16 +88,39 @@
       font-size: 0.9rem;
       color: #666;
     }
-    .date-container {
-      position: relative;
-    }
-    .date-container input {
-      padding-left: 32px;
-    }
+	
+	
+	.date-container {
+	  position: relative;
+	  display: flex;
+	  align-items: center;
+	  width: 100%;
+	  max-width: 300px; /* ajustable */
+	}
+
+	.calendar-icon {
+	  position: absolute;
+	  left: 10px;
+	  font-size: 1.2em;
+	  pointer-events: none;
+	  color: #555;
+	}
+
+	.date-container input {
+	  width: 100%;
+	  padding: 10px 10px 10px 35px; /* espace à gauche pour l’icône */
+	  border: 1px solid #ccc;
+	  border-radius: 4px;
+	  box-sizing: border-box;
+	}
+
+	
+	
     #importExportSection {
       text-align: center;
       margin-bottom: 2rem;
     }
+	
     #rechercheInput {
       width: 100%;
       padding: 10px;
@@ -103,58 +128,98 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
+	
+	
+		.liste-realisation {
+	  position: fixed;
+	  top: 1rem;
+	  left: 1rem;
+	  background: #fff;
+	  border: 1px solid #ccc;
+	  padding: 0.5rem;
+	  border-radius: 6px;
+	  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	  z-index: 1000;
+	  max-width: 250px;
+	}
+	.liste-realisation h3 {
+	  margin: 0 0 0.5rem 0;
+	  font-size: 1rem;
+	}
+	.liste-realisation ul {
+	  list-style: none;
+	  padding: 0;
+	  margin: 0;
+	}
+	.liste-realisation li {
+	  font-size: 0.85rem;
+	  margin-bottom: 0.4rem;
+	}
+
+	
+	
   </style>
 </head>
 <body>
 
   <h1>📋 Gestion des Travaux</h1>
+  
+ <div class="liste-realisation" id="listeRealisationContainer" style="display:none;">
+  <h3>🛠 À réaliser</h3>
+  <ul id="listeRealisation"></ul>
+</div>
 
   <div id="importExportSection">
-    <input type="file" id="importFile" accept=".txt" style="display:none" />
-    <button id="btnImport">⬆ Importer bdTravaux.txt</button>
-    <button id="btnExport">⬇ Exporter bdTravaux.txt</button>
+	<input type="file" id="importFile" accept=".txt" style="display:none" />
+	<button id="btnImport">⬆ Importer bdTravaux.txt</button>
+	<button id="btnExport">⬇ Exporter bdTravaux.txt</button>
   </div>
 
   <div style="text-align:center;">
-    <button id="btnAjouter">➕ Ajouter un travail</button>
-    <button id="btnSupprimerTous">🗑 Supprimer tous les travaux</button>
+	<button id="btnAjouter">➕ Ajouter un travail</button>
+	<button id="btnSupprimerTous">🗑 Supprimer tous les travaux</button>
   </div>
 
   <div class="form-container" id="formContainer">
-    <input type="hidden" id="ficheId" />
-    <label for="type">Type</label>
-    <select id="type">
-      <option value="MH">MH</option>
-      <option value="CH">CH</option>
-      <option value="EMP">EMP</option>
-      <option value="BAT">BAT</option>
-      <option value="Autre">Autre</option>
-    </select>
+	<input type="hidden" id="ficheId" />
+	<label for="type">Type</label>
+	<select id="type">
+	  <option value="MH">MH</option>
+	  <option value="CH">CH</option>
+	  <option value="EMP">EMP</option>
+	  <option value="BAT">BAT</option>
+	  <option value="Autre">Autre</option>
+	</select>
 
-    <label for="numero">Numéro</label>
-    <input type="text" id="numero" placeholder="Numéro" />
+	<label for="numero">Numéro</label>
+	<input type="text" id="numero" placeholder="Numéro" />
 
-    <label for="famille">Famille</label>
-    <select id="famille">
-      <option value="Casse">Casse</option>
-      <option value="Deco">Deco</option>
-      <option value="Plomberie">Plomberie</option>
-      <option value="Electricité">Electricité</option>
-      <option value="Terrasse">Terrasse</option>
-      <option value="Debrousaillage">Débroussaillage</option>
-      <option value="Autre">Autre</option>
-    </select>
+	<label for="famille">Famille</label>
+	<select id="famille">
+	  <option value="Casse">Casse</option>
+	  <option value="Deco">Deco</option>
+	  <option value="Plomberie">Plomberie</option>
+	  <option value="Electricité">Electricité</option>
+	  <option value="Terrasse">Terrasse</option>
+	  <option value="Debrousaillage">Débroussaillage</option>
+	  <option value="Autre">Autre</option>
+	</select>
 
-    <label for="precision">Précision</label>
-    <input type="text" id="precision" placeholder="Précisions Travaux" />
 
-    <label for="date">Date sélectionnée</label>
-    <div class="date-container">
-      <input type="text" id="date" placeholder="Sélectionnez une date" />
-    </div>
+	<label for="precision">Précision</label>
+	<input type="text" id="precision" list="precision-list" placeholder="Précisions Travaux" />
+	<datalist id="precision-list"></datalist>
 
-    <button id="btnValider">Valider</button>
-    <button id="btnSupprimer">Supprimer</button>
+	
+	<label for="date">Date sélectionnée</label>
+	<div class="date-container">
+	  <span class="calendar-icon">📅</span>
+	  <input type="text" id="date" placeholder="Sélectionnez une date" />
+	</div>
+
+
+	<button id="btnValider">Valider</button>
+	<button id="btnSupprimer">Supprimer</button>
   </div>
 
   <input type="text" id="rechercheInput" placeholder="🔍 Rechercher un travail..." />
@@ -198,6 +263,12 @@
           const div = document.createElement('div');
           div.appendChild(title);
           div.appendChild(subtitle);
+
+			li.onclick = (e) => {
+			  if (e.target.tagName !== 'BUTTON') {
+				ajouterDansListeARealiser(item);
+			  }
+			};
 
           li.appendChild(div);
           li.appendChild(btn);
@@ -327,6 +398,76 @@
       a.remove();
       URL.revokeObjectURL(url);
     }
+	
+	function chargerListeARealiser() {
+	  const liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
+	  const conteneur = document.getElementById('listeRealisation');
+	  conteneur.innerHTML = '';
+
+	  if (liste.length === 0) {
+		document.getElementById('listeRealisationContainer').style.display = 'none';
+		return;
+	  }
+
+	  document.getElementById('listeRealisationContainer').style.display = 'block';
+
+	  liste.forEach(t => {
+		const li = document.createElement('li');
+		li.textContent = `${t.type} ${t.numero} (${t.dateSelection})`;
+		li.style.cursor = 'pointer';
+		li.title = 'Cliquer pour retirer de la liste';
+		li.onclick = () => retirerDeListeARealiser(t.id);
+		conteneur.appendChild(li);
+	  });
+	}
+
+
+	function ajouterDansListeARealiser(travail) {
+	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
+	  if (!liste.some(t => t.id === travail.id)) {
+		liste.push(travail);
+		localStorage.setItem('listeTravauxARealiser', JSON.stringify(liste));
+		chargerListeARealiser();
+	  }
+	}
+	
+	function retirerDeListeARealiser(id) {
+	  let liste = JSON.parse(localStorage.getItem('listeTravauxARealiser')) || [];
+	  const elementRetire = liste.find(t => t.id === id);
+
+	  // Supprimer de la liste
+	  liste = liste.filter(t => t.id !== id);
+	  localStorage.setItem('listeTravauxARealiser', JSON.stringify(liste));
+
+	  // Ajouter à bdCorbeille
+	  let corbeille = JSON.parse(localStorage.getItem('bdCorbeille')) || [];
+	  if (elementRetire && !corbeille.some(t => t.id === id)) {
+		corbeille.push(elementRetire);
+		localStorage.setItem('bdCorbeille', JSON.stringify(corbeille));
+	  }
+
+	  chargerListeARealiser();
+	}
+	
+		// Chargement de bdTravaux depuis le localStorage
+	  const bdTravaux = JSON.parse(localStorage.getItem("bdTravaux")) || [];
+	  
+
+	  // Récupération des parts[4] uniques
+	  const precisions = [...new Set(bdTravaux.map(item => {
+		const parts = item.split("§");
+		return parts[4] || ""; // éviter undefined
+	  }).filter(p => p.trim() !== ""))]; // on filtre les vides
+
+	  // Remplir la datalist
+	  const datalist = document.getElementById("precision-list");
+	  precisions.forEach(p => {
+		const option = document.createElement("option");
+		option.value = p;
+		datalist.appendChild(option);
+	  });
+
+
 
     // Initialisation
     flatpickr("#date", { dateFormat: "d/m/Y", locale: "fr" });
@@ -345,6 +486,7 @@
     document.getElementById('rechercheInput').addEventListener('input', e => afficherTravaux(e.target.value));
 
     afficherTravaux();
+	chargerListeARealiser();
   </script>
 </body>
 </html>
