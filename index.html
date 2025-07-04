@@ -360,27 +360,51 @@
       }
     }
 
+    // --- Importer bdTravaux.txt ---
     function importerFichier(file) {
       const reader = new FileReader();
       reader.onload = e => {
-        const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+        const text = e.target.result;
+        const lignes = text.split(/\r?\n/).filter(l => l.trim() !== '');
+
+        // Trouver max id actuel
         let maxId = travaux.length ? Math.max(...travaux.map(t => t.id)) : 0;
-        let count = 0;
-        for (let l of lines) {
-          const [id, type, numero, famille, precision, dateAjout, dateSelection] = l.split('|');
-          if (type && numero && dateSelection) {
-            let newId = Number(id);
-            if (isNaN(newId) || travaux.some(t => t.id === newId)) {
+
+        let importCount = 0;
+        lignes.forEach(line => {
+          const parts = line.split('|');
+          if (parts.length >= 7) {
+            let [id, type, numero, famille, precision, dateAjout, dateSelection] = parts;
+
+            // Convertir id en number et éviter doublons
+            id = Number(id);
+            if (isNaN(id)) return; // ignore ligne mal formée
+
+            // Si id existe déjà, on modifie l'id en incrémentant
+            if (travaux.some(t => t.id === id)) {
               maxId++;
-              newId = maxId;
+              id = maxId;
+            } else if (id > maxId) {
+              maxId = id;
             }
-            travaux.push({ id: newId, type, numero, famille, precision, dateAjout, dateSelection });
-            count++;
+
+            // Ajouter la fiche importée
+            travaux.push({
+              id,
+              type,
+              numero,
+              famille,
+              precision,
+              dateAjout,
+              dateSelection
+            });
+            importCount++;
           }
-        }
+        });
+
         localStorage.setItem('travaux', JSON.stringify(travaux));
         afficherTravaux();
-        alert(`${count} fiches importées.`);
+        alert(`Import terminé : ${importCount} fiches ajoutées.`);
       };
       reader.readAsText(file);
     }
